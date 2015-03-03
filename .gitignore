@@ -1,11 +1,9 @@
-# Build and Release Folders
-bin/
-bin-debug/
-bin-release/
+.vagrant/
+Vagrantfile
+.idea/
+*.yml
 
-# Other files and folders
-.settings/
-
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+csv/
+answer1/
+consume-csv.php
+CsvIterator.php
