@@ -45,6 +45,7 @@ echo sprintf("Max users: %s, Max movies: %s \n",
 
 $movieRatesForUserAssigned = 0;
 $currentUserId = 1;
+$currentGender = 'm';
 $i = 1;
 $percentLines = (int)$lines/100;
 echo "Progress :      ";  // 5 characters of padding at the end
@@ -55,7 +56,7 @@ while ($i <= $lines) {
     }
 
     $userId     = $currentUserId;
-    $gender     = $i % 2 === 1 ? 'm' : 'f';
+    $gender     = $currentGender;
     $movieId    = rand(1, $maxMovies);
     $rating     = (int) (rand(20, 95) * rand(95, 105) / 100);
 
@@ -66,6 +67,7 @@ while ($i <= $lines) {
     if ($movieRatesForUserAssigned == $movieRatesPerUser ) {
         $movieRatesForUserAssigned = 0;
         $currentUserId++;
+        $currentGender = ord(md5($currentUserId)) % 2 === 1 ? 'm' : 'f';
     }
 
     if ($i % $percentLines === 0) {
