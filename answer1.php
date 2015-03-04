@@ -16,26 +16,33 @@ if (!isset($opts['c'])) {
     usage();
 }
 
-$collectionName = $opts['c'];
-
 $time_start = microtime(true);
 $initialMem = memory_get_usage();
 
+$collectionName = $opts['c'];
 echo sprintf("Preparing answer 1 csv for collection %s\n", $collectionName);
 
+MongoCursor::$timeout = -1;
 $m = new MongoClient();
 echo "Connection to database successfully\n";
-$db = $m->exptest;
-echo "Database exptest selected\n";
-$collection = $db->$collectionName;
-echo "Collection $collectionName selected succsessfully\n";
+
+$collection = $m->selectDB('exptest')->selectCollection($collectionName);
+echo "Database exptest with collection $collectionName selected\n";
 
 $outCollectionName = "out_$collectionName";
 $outFile = "answer1/$outCollectionName.csv";
 $ops = [
     [
         '$group' => [
-            '_id' => '$user_id',
+            '_id' => [
+                'user_id'  => '$user_id',
+                'movie_id' => '$movie_id'
+            ]
+        ]
+    ],
+    [
+        '$group' => [
+            '_id'   => '$_id.user_id',
             'rated_movies' => ['$sum' => 1],
         ]
     ],
@@ -46,13 +53,12 @@ $ops = [
     ],
     [ '$out' => $outCollectionName ]
 ];
-$options = array("allowDiskUse" => true);
-$cursor = $collection->aggregate($ops, $options);
+
+$cursor = $collection->aggregate($ops);
 
 echo "Collection $outCollectionName created succsessfully\n";
 
-shell_exec("mongoexport -d exptest -c $outCollectionName -f _id,rated_movies --csv > $outFile");
-
+shell_exec("mongoexport -d exptest -c $outCollectionName -f _id,rated_movies --type=csv > $outFile");
 
 $time_end = microtime(true);
 $finalMem = memory_get_peak_usage();
