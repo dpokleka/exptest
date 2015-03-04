@@ -30,7 +30,7 @@ $tableName = pathinfo($file)['filename'];
 
 echo sprintf("Importing file %s\n", $file);
 
-shell_exec("mongoimport -d exptest -c $tableName --type csv --file $file --headerline");
+shell_exec("mongoimport -d exptest -c $tableName --type=csv --file $file --headerline --ignoreBlanks --drop");
 
 $time_end = microtime(true);
 $finalMem = memory_get_peak_usage();
