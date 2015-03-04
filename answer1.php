@@ -1,12 +1,14 @@
 <?php
 
 require 'Utilities/Helper.php';
+require 'Utilities/MongoHelper.php';
 
 use Utilities\Helper;
+use Utilities\MongoHelper;
 
 function usage() {
-    echo "Usage: answer.php -c collection\n";
-    echo "\n Example: answer.php -c sample_150\n";
+    echo "Usage: answer1.php -c collection\n";
+    echo "\n Example: answer1.php -c sample_150\n";
     exit(1);
 }
 
@@ -16,21 +18,11 @@ if (!isset($opts['c'])) {
     usage();
 }
 
-$time_start = microtime(true);
-$initialMem = memory_get_usage();
-
 $collectionName = $opts['c'];
-echo sprintf("Preparing answer 1 csv for collection %s\n", $collectionName);
 
-MongoCursor::$timeout = -1;
-$m = new MongoClient();
-echo "Connection to database successfully\n";
+$helper = new Helper();
+$mh     = new MongoHelper('answer1', $collectionName);
 
-$collection = $m->selectDB('exptest')->selectCollection($collectionName);
-echo "Database exptest with collection $collectionName selected\n";
-
-$outCollectionName = "out_$collectionName";
-$outFile = "answer1/$outCollectionName.csv";
 $ops = [
     [
         '$group' => [
@@ -51,20 +43,18 @@ $ops = [
             '_id' => 1
         ],
     ],
-    [ '$out' => $outCollectionName ]
+    [ '$out' => $mh->outCollectionName ]
 ];
 
-$cursor = $collection->aggregate($ops);
+$cursor = $mh->collection->aggregate($ops);
 
-echo "Collection $outCollectionName created succsessfully\n";
+echo "Collection $mh->outCollectionName created succsessfully\n";
 
-shell_exec("mongoexport -d exptest -c $outCollectionName -f _id,rated_movies --type=csv > $outFile");
+shell_exec("mongoexport -d exptest -c $mh->outCollectionName -f _id,rated_movies --type=csv > $mh->outFile");
 
-$time_end = microtime(true);
-$finalMem = memory_get_peak_usage();
-$execution_time = ($time_end - $time_start);
-
-echo sprintf("Outputted file %s from MONGO collection %s in %s sec; Generated file size is: %s; Memory used: %s \n",
-    $outFile, $outCollectionName, number_format($execution_time, 2, ',', '.'),
-    Helper::human_filesize(filesize($outFile)), Helper::human_filesize($finalMem - $initialMem)
+echo sprintf("Outputted file %s from MONGO collection %s; Generated file size is: %s; \n",
+    $mh->outFile, $mh->outCollectionName, Helper::human_filesize(filesize($mh->outFile))
 );
+
+$helper->endStats();
+$helper->printStats();
