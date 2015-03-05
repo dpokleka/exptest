@@ -77,4 +77,3 @@ echo sprintf(
 );
 
 $helper->endStats()->printStats();
-Helper::printLine();
