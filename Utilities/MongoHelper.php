@@ -188,7 +188,35 @@ class MongoHelper
                 ],
                 'field_list' => '_id,watched_movies'
             ],
-            '4' => [],
+            '4' => [
+                'operators' => [
+                    [
+                        '$group' => [
+                            '_id' => [
+                                'user_id'  => '$user_id',
+                                'gender'   => '$gender',
+                                'movie_id' => '$movie_id'
+                            ],
+                            'avg_rtg_user_movie' => ['$avg' => '$rating'],
+                        ]
+                    ],
+                    [
+                        '$group' => [
+                            '_id'   => '$_id.gender',
+                            'avg_rtg_gender' => ['$avg' => '$avg_rtg_user_movie'],
+                        ]
+                    ],
+                    [
+                        '$sort' => [
+                            '_id' => 1
+                        ],
+                    ],
+                    [
+                        '$out' => $this->outCollectionName
+                    ]
+                ],
+                'field_list' => '_id,avg_rtg_gender'
+            ],
         ];
 
         return (array_key_exists($answer, $answerSettings) ? $answerSettings[$answer] : null);
