@@ -160,7 +160,34 @@ class MongoHelper
                 ],
                 'field_list' => '_id,all_rates'
             ],
-            '3' => [],
+            '3' => [
+                'operators' => [
+                    [
+                        '$group' => [
+                            '_id' => [
+                                'user_id'  => '$user_id',
+                                'gender'   => '$gender',
+                                'movie_id' => '$movie_id'
+                            ]
+                        ]
+                    ],
+                    [
+                        '$group' => [
+                            '_id'   => '$_id.gender',
+                            'watched_movies' => ['$sum' => 1],
+                        ]
+                    ],
+                    [
+                        '$sort' => [
+                            '_id' => 1
+                        ],
+                    ],
+                    [
+                        '$out' => $this->outCollectionName
+                    ]
+                ],
+                'field_list' => '_id,watched_movies'
+            ],
             '4' => [],
         ];
 
