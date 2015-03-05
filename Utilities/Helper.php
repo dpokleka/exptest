@@ -30,26 +30,40 @@ class Helper {
     private $finalMemory;
 
 
-    function __construct()
+    /**
+     * @param bool $autoStartStats
+     */
+    function __construct($autoStartStats = true)
     {
-        $this->startStats();
+        if ($autoStartStats) {
+            $this->startStats();
+        }
     }
-
 
     /**
      * Start the stats measurement
+     *
+     * @return $this
      */
-    public function startStats() {
+    public function startStats()
+    {
         $this->timeStart     = microtime(true);
         $this->initialMemory = memory_get_usage();
+
+        return $this;
     }
 
     /**
      * Stops the stats measurement
+     *
+     * @return $this
      */
-    public function endStats() {
-        $this->timeEnd      = microtime(true);
+    public function endStats()
+    {
+        $this->timeEnd     = microtime(true);
         $this->finalMemory = memory_get_peak_usage();
+
+        return $this;
     }
 
     /**
@@ -70,10 +84,17 @@ class Helper {
 
     public function printStats()
     {
-        echo sprintf("Script duration %s s; Memory peak consumption: %s\n",
-                     number_format($this->getExecuionTime(), 2, ',', '.'),
-                     self::human_filesize($this->getMemoryConsuption())
-             );
+        self::printLine();
+        echo sprintf(
+            'Script duration %s s; Memory peak consumption: %s' . PHP_EOL,
+             number_format($this->getExecuionTime(), 2, ',', '.'), self::human_filesize($this->getMemoryConsuption())
+        );
+        self::printLine();
+    }
+
+    public static function printLine()
+    {
+        echo '------------------------------------------------------------' . PHP_EOL;
     }
 
     /**

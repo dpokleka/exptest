@@ -5,8 +5,8 @@ require 'Utilities/Helper.php';
 use Utilities\Helper;
 
 function usage() {
-    echo "Usage: mysqlimport.php -i input.csv\n";
-    echo "\n Example: mysqlimport.php -i csv/sample.csv\n";
+    echo 'Usage:   mysqlimport.php -i input.csv' . PHP_EOL . PHP_EOL;
+    echo 'Example: mysqlimport.php -i csv/sample.csv' . PHP_EOL;
     exit(1);
 }
 
@@ -15,57 +15,66 @@ $opts = getopt('i:');
 if (!isset($opts['i'])) {
     usage();
 }
-
-$time_start = microtime(true);
-$initialMem = memory_get_usage();
-
 $file  = $opts['i'];
 
 if (!file_exists($file)) {
-    echo sprintf("File %s does not exist.", $file);
+    echo sprintf('File %s does not exist.' . PHP_EOL, $file);
     exit(1);
 }
 
-$tableName = pathinfo($file)['filename'];
+$helper = new Helper(true);
 
-echo sprintf("Importing file %s\n", $file);
+$host       = 'localhost';
+$dbName     = 'exptest2';
+$userName   = 'root';
+$password   = 'root';
+$tableName  = pathinfo($file)['filename'];
 
-## Connect to a local database server (or die) ##
-$dbH = mysqli_connect('localhost', 'root', 'root') or die('Could not connect to MySQL server.' . PHP_EOL . mysqli_error($dbH));
+Helper::printLine();
+echo sprintf('Importing file %s' . PHP_EOL, $file);
+Helper::printLine();
 
-## Select the database to insert to ##
-mysqli_select_db($dbH, 'exptest') or die('Could not select database.' . PHP_EOL . mysqli_error($dbH));
+try {
+    $db = new PDO(sprintf('mysql:host=%s;dbname=%s', $host, $dbName), $userName, $password);
 
-$result = mysqli_query($dbH, "SHOW TABLES LIKE '$tableName'");
-$tableExists = mysqli_num_rows($result) > 0;
+} catch (PDOException $e) {
 
-if ($tableExists) {
-    mysqli_query($dbH, "TRUNCATE TABLE $tableName;") or
-    die('Error truncating table.' . PHP_EOL . mysqli_error($dbH));
-} else {
-    mysqli_query($dbH, "CREATE TABLE IF NOT EXISTS $tableName (
-          user_id int(11) DEFAULT NULL,
-          gender set('m','f') DEFAULT NULL,
-          movie_id mediumint(9) DEFAULT NULL,
-          rating tinyint(4) DEFAULT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-    ") or die('Error creating table.' . PHP_EOL . mysqli_error($dbH));
+    if (strpos($e->getMessage(), 'Unknown database') !== false ) {
+        $db = new PDO(sprintf('mysql:host=%s', $host), $userName, $password);
+        $db->exec("CREATE DATABASE IF NOT EXISTS `$dbName` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;") or die(print_r($dbh->errorInfo(), true));
+    } else {
+        die('DB ERROR: ' . $e->getMessage());
+    }
+    $db = new PDO(sprintf('mysql:host=%s;dbname=%s', $host, $dbName), $userName, $password);
 }
 
-//mysqli_query($dbH, 'LOAD DATA LOCAL INFILE "' . $file . '" INTO TABLE ' . $tableName . ' FIELDS TERMINATED BY "," LINES TERMINATED BY "\\n";') or
-//    die('Error loading data file.' . PHP_EOL . mysqli_error($dbH));
+try {
+    $db->query("
+        CREATE TABLE IF NOT EXISTS $tableName (
+            user_id  int(11)      DEFAULT NULL,
+            gender   set('m','f') DEFAULT NULL,
+            movie_id mediumint(9) DEFAULT NULL,
+            rating   tinyint(4)   DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ");
+    $db->query("
+        TRUNCATE TABLE $tableName;
+    ");
 
-$columns = 'user_id,gender,movie_id,rating';
-shell_exec("mysqlimport --ignore-lines=1 --fields-terminated-by=, --columns='$columns' --local -u root -proot exptest $file");
+    $columns = 'user_id,gender,movie_id,rating';
+    shell_exec("mysqlimport --ignore-lines=1 --fields-terminated-by=, --columns='$columns' --local -u $userName -p$password $dbName $file");
 
-## Close database connection when finished ##
-mysqli_close($dbH);
+    ## Close database connection when finished ##
+    unset($db);
 
-$time_end = microtime(true);
-$finalMem = memory_get_peak_usage();
-$execution_time = ($time_end - $time_start);
+} catch (PDOException $e) {
+    die('DB ERROR: ' . $e->getMessage() . PHP_EOL);
+}
 
-echo sprintf("Imported file %s into MYSQL in %s sec; Memory used: %s \n",
-    $file, number_format($execution_time, 2, ',', '.'),
-    Helper::human_filesize(filesize($file)), Helper::human_filesize($finalMem - $initialMem)
+echo sprintf(
+    'Imported file %s (%s) into MYSQL.' . PHP_EOL,
+    $file, Helper::human_filesize(filesize($file))
 );
+
+$helper->endStats()->printStats();
+Helper::printLine();
