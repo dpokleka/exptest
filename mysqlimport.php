@@ -34,6 +34,7 @@ Helper::printLine();
 echo sprintf('Importing file %s' . PHP_EOL, $file);
 Helper::printLine();
 
+// try to connect to DB and create it if it does not exist
 try {
     $db = new PDO(sprintf('mysql:host=%s;dbname=%s', $host, $dbName), $userName, $password);
 
@@ -47,8 +48,10 @@ try {
     }
     $db = new PDO(sprintf('mysql:host=%s;dbname=%s', $host, $dbName), $userName, $password);
 }
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 try {
+    // create the receiving table if it does not exist and empty it.
     $db->query("
         CREATE TABLE IF NOT EXISTS $tableName (
             user_id  int(11)      DEFAULT NULL,
@@ -61,6 +64,7 @@ try {
         TRUNCATE TABLE $tableName;
     ");
 
+    // invoke mysql import command with proper settings
     $columns = 'user_id,gender,movie_id,rating';
     shell_exec("mysqlimport --ignore-lines=1 --fields-terminated-by=, --columns='$columns' --local -u $userName -p$password $dbName $file");
 
