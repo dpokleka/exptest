@@ -3,11 +3,12 @@
 namespace Utilities;
 
 /**
- * Class Helper
+ * Class StatsHelper
  *
  * @package   Utilities
+ * @author    David Pokleka <david.pokleka@gmail.com>
  */
-class Helper {
+class StatsHelper {
 
     /**
      * @var float $timeStart
@@ -33,7 +34,7 @@ class Helper {
     /**
      * @param bool $autoStartStats
      */
-    function __construct($autoStartStats = true)
+    public function __construct($autoStartStats = true)
     {
         if ($autoStartStats) {
             $this->startStats();

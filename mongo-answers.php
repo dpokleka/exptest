@@ -1,14 +1,14 @@
 <?php
 
-require 'Utilities/Helper.php';
+require 'Utilities/StatsHelper.php';
 require 'Utilities/MongoHelper.php';
 
-use Utilities\Helper;
+use Utilities\StatsHelper;
 use Utilities\MongoHelper;
 
 function usage() {
-    echo "Usage: answers_mongo.php.php -a answer_number -c collection\n";
-    echo "\n Example: answers_mongo.php.php -a 1 -c sample_150\n";
+    echo 'Usage: mongo-answers.php.php -a ANSWER_NUMBER -c COLLECTION_NAME' . PHP_EOL . PHP_EOL;
+    echo 'Example: mongo-answers.php.php -a 1 -c sample_150' . PHP_EOL;
     exit(1);
 }
 
@@ -21,7 +21,7 @@ if (! isset($opts['a']) || ! isset($opts['c'])) {
 $answerNumber   = $opts['a'];
 $collectionName = $opts['c'];
 
-$helper = new Helper(true);
+$helper = new StatsHelper(true);
 $mh     = new MongoHelper($answerNumber, $collectionName);
 
 $mh->execute();

@@ -1,12 +1,12 @@
 <?php
 
-require 'Utilities/Helper.php';
+require 'Utilities/StatsHelper.php';
 
-use Utilities\Helper;
+use Utilities\StatsHelper;
 
 function usage() {
-    echo 'Usage:   mongoimport.php -i input.csv' . PHP_EOL . PHP_EOL;
-    echo 'Example: mongoimport.php -i csv/sample.csv' . PHP_EOL;
+    echo 'Usage:   mongo-import.php -i CSV_FILE' . PHP_EOL . PHP_EOL;
+    echo 'Example: mongo-import.php -i csv/sample.csv' . PHP_EOL;
     exit(1);
 }
 
@@ -22,19 +22,19 @@ if (!file_exists($file)) {
     exit(1);
 }
 
-$helper = new Helper(true);
+$helper = new StatsHelper(true);
 
 $tableName = pathinfo($file)['filename'];
 
-Helper::printLine();
+StatsHelper::printLine();
 echo sprintf('Importing file %s' . PHP_EOL, $file);
-Helper::printLine();
+StatsHelper::printLine();
 
 shell_exec("mongoimport -d exptest -c $tableName --type=csv --file $file --headerline --ignoreBlanks --drop");
 
 echo sprintf(
     'Imported file %s (%s) into MONGO' . PHP_EOL,
-    $file, Helper::human_filesize(filesize($file))
+    $file, StatsHelper::human_filesize(filesize($file))
 );
 
 $helper->endStats()->printStats();

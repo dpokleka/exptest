@@ -1,8 +1,8 @@
 <?php
 
-require 'Utilities/Helper.php';
+require 'Utilities/StatsHelper.php';
 
-use Utilities\Helper;
+use Utilities\StatsHelper;
 
 function usage()
 {
@@ -29,11 +29,11 @@ if (! file_exists(dirname($file))) {
     mkdir(dirname($file), 0775, true);
 }
 
-$helper = new Helper(true);
+$helper = new StatsHelper(true);
 
-Helper::printLine();
+StatsHelper::printLine();
 echo sprintf('Outputting %s lines into %s' . PHP_EOL, number_format($lines,0,',', '.'), $file);
-Helper::printLine();
+StatsHelper::printLine();
 
 $handle = fopen($file, 'w');
 fputcsv($handle, array('user_id', 'gender', 'movie_id', 'rating'));
@@ -83,7 +83,7 @@ fclose($handle);
 
 echo sprintf(
     PHP_EOL . 'Finished outputting %s lines; Generated file size is: %s ' . PHP_EOL,
-    number_format($lines, 0, ',', '.'), Helper::human_filesize(filesize($file))
+    number_format($lines, 0, ',', '.'), StatsHelper::human_filesize(filesize($file))
 );
 
 $helper->endStats()->printStats();

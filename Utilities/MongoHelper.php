@@ -55,7 +55,7 @@ class MongoHelper
         $this->collectionName   = $collectionName;
         $this->dbName           = 'exptest';
 
-        Helper::printLine();
+        StatsHelper::printLine();
         echo sprintf('Preparing %s csv file for collection %s' . PHP_EOL, $this->answerDir, $this->collectionName);
 
         MongoCursor::$timeout = -1;
@@ -95,15 +95,15 @@ class MongoHelper
         echo sprintf("Collection %s created successfully" . PHP_EOL, $this->outCollectionName);
 
         $command = sprintf(
-            "mongoexport -d exptest -c %s -f %s --type=csv > %s",
+            'mongoexport -d exptest -c %s -f %s --type=csv > %s',
             $this->outCollectionName, $answerSettings['field_list'], $this->outFile
         );
 
         shell_exec($command);
 
         echo sprintf(
-            "Answer %s collection outputted into %s; Generated file size is: %s; \n",
-            $this->answerNumber, $this->outFile, Helper::human_filesize(filesize($this->outFile))
+            'Answer %s collection outputted into %s; Generated file size is: %s;' . PHP_EOL,
+            $this->answerNumber, $this->outFile, StatsHelper::human_filesize(filesize($this->outFile))
         );
     }
 
