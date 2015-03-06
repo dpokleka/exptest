@@ -39,6 +39,6 @@ The resulting collection name will be the same as the csv file used for importin
 
 This script is used to generate the results from sample data stored in the **mongo database** helping answer the 4 questions in the exercise.
 
-> **Usage:**   `answers_mongo.php.php -a ANSWER_NUMBER -c COLLECTION_NAME`
+> **Usage:**   `mongo-answers.php.php -a ANSWER_NUMBER -c COLLECTION_NAME`
 
-> **Example:** `answers_mongo.php.php -a 1 -c sample_1000`
+> **Example:** `mongo-answers.php.php -a 1 -c sample_1000`
