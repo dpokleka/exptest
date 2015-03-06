@@ -15,7 +15,7 @@ This script is used to generate csv files of desired size with the structure spe
 > **Example:** `generate-csv.php -n 1000 -o csv`
 
 
-### mysqlimport.php
+### mysql-import.php
 
 This script is used to import the generated csv files into a **MySql** database
  The resulting table name will be the same as the csv file used for importing.
@@ -25,7 +25,7 @@ This script is used to import the generated csv files into a **MySql** database
 > **Example:** `mysql-import.php -i csv/sample_1000.csv`
 
 
-### mongoimport.php
+### mongo-import.php
 
 This script is used to import the generated csv files into a **Mongo** database.
 The resulting collection name will be the same as the csv file used for importing.
@@ -35,7 +35,7 @@ The resulting collection name will be the same as the csv file used for importin
 > **Example:** `mongo-import.php -i csv/sample_1000.csv`
 
 
-### answers_mongo.php
+### mongo-answers.php
 
 This script is used to generate the results from sample data stored in the **mongo database** helping answer the 4 questions in the exercise.
 
