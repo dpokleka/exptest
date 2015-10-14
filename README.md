@@ -1,5 +1,3 @@
-# Backend Software Engineer Expertise Test
-
 ## Movie rating exercise
 
 This repo holds the code that accompanies the exercise solution 
