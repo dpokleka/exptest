@@ -1,9 +1,5 @@
 ## Movie rating exercise
 
-This repo holds the code that accompanies the exercise solution 
-found in this [google document](https://docs.google.com/document/d/1YCfQoDRuZINT1H8cbPVfFLQDSjQGF-tx_p4X1zkeeuc):
-
-
 ### generate-csv.php
 
 This script is used to generate csv files of desired size with the structure specified in the exercise.
